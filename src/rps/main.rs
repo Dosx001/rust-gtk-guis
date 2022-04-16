@@ -1,6 +1,6 @@
-use gtk4 as gtk;
 use gtk::prelude::*;
-use gtk::{Application, ApplicationWindow, Button, Box, Label,};
+use gtk::{Application, ApplicationWindow, Box, Button, Label};
+use gtk4 as gtk;
 
 use std::sync::atomic::{AtomicIsize, Ordering};
 use std::sync::Arc;
@@ -13,12 +13,8 @@ impl Counter {
     }
 
     fn increment(&self) -> isize {
-        let old = self.0.fetch_add(1, Ordering::SeqCst);
-        old + 1
-    }
-
-    fn get(&self) -> isize {
-        self.0.load(Ordering::SeqCst)
+        let value = self.0.fetch_add(1, Ordering::SeqCst);
+        value + 1
     }
 }
 
@@ -31,38 +27,29 @@ fn main() {
         let wins = Arc::new(Counter::new(0));
         let loses = Arc::new(Counter::new(0));
         let ties = Arc::new(Counter::new(0));
-        let lab1 = Label::new(Some(&format!("Wins: {}", wins.get())));
-        let lab2 = Label::new(Some(&format!("Loses: {}", loses.get())));
-        let lab3 = Label::new(Some(&format!("Ties: {}", ties.get())));
+        let lab1 = Label::new(Some("Wins: 0"));
+        let lab2 = Label::new(Some("Loses: 0"));
+        let lab3 = Label::new(Some("Ties: 0"));
         let hbox2 = Box::new(gtk::Orientation::Horizontal, 3);
         hbox2.append(&lab1);
         hbox2.append(&lab2);
         hbox2.append(&lab3);
         let btn1 = Button::with_label("Rock");
         {
-            let label_clone = lab1;
-            let counter_clone = wins;
             btn1.connect_clicked(move |_| {
-                let val = counter_clone.increment();
-                label_clone.set_label(&format!("Wins: {}", val));
+                lab1.set_label(&format!("Wins: {}", wins.increment()));
             });
         }
         let btn2 = Button::with_label("Paper");
         {
-            let label_clone = lab2;
-            let counter_clone = ties;
             btn2.connect_clicked(move |_| {
-                let val = counter_clone.increment();
-                label_clone.set_label(&format!("Wins: {}", val));
+                lab2.set_label(&format!("Loses: {}", ties.increment()));
             });
         }
         let btn3 = Button::with_label("Scissors");
         {
-            let label_clone = lab3;
-            let counter_clone = loses;
             btn3.connect_clicked(move |_| {
-                let val = counter_clone.increment();
-                label_clone.set_label(&format!("Wins: {}", val));
+                lab3.set_label(&format!("Ties: {}", loses.increment()));
             });
         }
         let hbox1 = Box::new(gtk::Orientation::Horizontal, 3);
@@ -77,4 +64,3 @@ fn main() {
     });
     application.run();
 }
-
