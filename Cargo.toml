@@ -11,3 +11,7 @@ gtk4 = "0.4.7"
 [[bin]]
 name = "counter"
 path = "src/counter/main.rs"
+
+[[bin]]
+name = "rps"
+path = "src/rps/main.rs"
