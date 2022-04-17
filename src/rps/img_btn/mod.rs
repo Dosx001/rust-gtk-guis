@@ -1,8 +1,7 @@
 mod imp;
 
-use gtk::prelude::*;
 use gtk::subclass::prelude::*;
-use gtk::{gio, glib};
+use gtk::glib;
 use gtk4 as gtk;
 
 glib::wrapper! {

@@ -1,7 +1,10 @@
 use gtk::prelude::*;
-use gtk::{Application, ApplicationWindow, Box, Button, Label};
+use gtk::{Application, ApplicationWindow, Box, Label};
 use gtk4 as gtk;
 use rand::Rng;
+
+mod img_btn;
+use img_btn::ImgBtn;
 
 use std::sync::atomic::{AtomicIsize, Ordering};
 use std::sync::Arc;
@@ -74,7 +77,7 @@ fn main() {
         hbox2.append(&lab1);
         hbox2.append(&lab2);
         hbox2.append(&lab3);
-        let btn1 = Button::with_label("Rock");
+        let btn1 = ImgBtn::new();
         {
             let lab1c = lab1.clone();
             let lab2c = lab2.clone();
@@ -93,7 +96,8 @@ fn main() {
                 }
             });
         }
-        let btn2 = Button::with_label("Paper");
+        btn1.set_image("src/rps/assets/Bulbasaur.png");
+        let btn2 = ImgBtn::new();
         {
             let lab1c = lab1.clone();
             let lab2c = lab2.clone();
@@ -112,7 +116,8 @@ fn main() {
                 }
             });
         }
-        let btn3 = Button::with_label("Scissors");
+        btn2.set_image("src/rps/assets/Charmander.png");
+        let btn3 = ImgBtn::new();
         {
             btn3.connect_clicked(move |_| {
                 let (res, pick) = result(2);
@@ -124,6 +129,7 @@ fn main() {
                 }
             });
         }
+        btn3.set_image("src/rps/assets/Squirtle.png");
         let hbox1 = Box::new(gtk::Orientation::Horizontal, 3);
         hbox1.append(&btn1);
         hbox1.append(&btn2);
