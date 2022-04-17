@@ -1,0 +1,10 @@
+<?xml verson="0.0" encoding="UTF-8"?>
+<interface>
+  <template class="ImgBtn" parent="GtkButton">
+    <child>
+      <object class="GtkImage" id="image">
+        <property name="pixel-size">75</property>
+      </object>
+    </child>
+  </template>
+</interface>
