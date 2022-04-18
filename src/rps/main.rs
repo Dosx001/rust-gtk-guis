@@ -22,6 +22,112 @@ impl Counter {
     }
 }
 
+fn main() {
+    let application = Application::new(None, Default::default());
+    application.connect_startup(|app| {
+        build_ui(app)
+    });
+    application.run();
+}
+
+fn build_ui(application: &Application) {
+    let window = ApplicationWindow::builder()
+        .application(application)
+        .title("Rock, Paper, Scissors: Pokemom Ver.")
+        .default_width(70)
+        .default_height(350)
+        .build();
+    let pics = [
+        "src/rps/assets/Bulbasaur.png",
+        "src/rps/assets/Charmander.png",
+        "src/rps/assets/Squirtle.png",
+    ];
+    let pkm = gtk::Image::new();
+    pkm.set_pixel_size(100);
+    let wins = Arc::new(Counter::new(0));
+    let loses = Arc::new(Counter::new(0));
+    let ties = Arc::new(Counter::new(0));
+    let lab1 = Label::new(Some("Wins: 0"));
+    let lab2 = Label::new(Some("Loses: 0"));
+    let lab3 = Label::new(Some("Ties: 0"));
+    let hbox2 = Box::new(gtk::Orientation::Horizontal, 3);
+    hbox2.append(&lab1);
+    hbox2.append(&lab2);
+    hbox2.append(&lab3);
+    let btn1 = ImgBtn::new();
+    {
+        let lab1c = lab1.clone();
+        let lab2c = lab2.clone();
+        let lab3c = lab3.clone();
+        let winsc = wins.clone();
+        let losesc = loses.clone();
+        let tiesc = ties.clone();
+        let pkmc = pkm.clone();
+        btn1.connect_clicked(move |_| {
+            let (res, pick) = result(0);
+            pkmc.set_from_file(Some(pics[pick]));
+            match res {
+                0 => lab1c.set_label(&format!("Wins: {}", winsc.increment())),
+                1 => lab2c.set_label(&format!("Loses: {}", losesc.increment())),
+                _ => lab3c.set_label(&format!("Ties: {}", tiesc.increment())),
+            }
+        });
+    }
+    btn1.set_image("src/rps/assets/BulbasaurBack.png");
+    let btn2 = ImgBtn::new();
+    {
+        let lab1c = lab1.clone();
+        let lab2c = lab2.clone();
+        let lab3c = lab3.clone();
+        let winsc = wins.clone();
+        let losesc = loses.clone();
+        let tiesc = ties.clone();
+        let pkmc = pkm.clone();
+        btn2.connect_clicked(move |_| {
+            let (res, pick) = result(1);
+            pkmc.set_from_file(Some(pics[pick]));
+            match res {
+                0 => lab1c.set_label(&format!("Wins: {}", winsc.increment())),
+                1 => lab2c.set_label(&format!("Loses: {}", losesc.increment())),
+                _ => lab3c.set_label(&format!("Ties: {}", tiesc.increment())),
+            }
+        });
+    }
+    btn2.set_image("src/rps/assets/CharmanderBack.png");
+    let btn3 = ImgBtn::new();
+    {
+        let pkmc = pkm.clone();
+        btn3.connect_clicked(move |_| {
+            let (res, pick) = result(2);
+            pkmc.set_from_file(Some(pics[pick]));
+            match res {
+                0 => lab1.set_label(&format!("Wins: {}", wins.increment())),
+                1 => lab2.set_label(&format!("Loses: {}", loses.increment())),
+                _ => lab3.set_label(&format!("Ties: {}", ties.increment())),
+            }
+        });
+    }
+    btn3.set_image("src/rps/assets/SquirtleBack.png");
+    let hbox1 = Box::new(gtk::Orientation::Horizontal, 3);
+    hbox1.append(&btn1);
+    hbox1.append(&btn2);
+    hbox1.append(&btn3);
+    let red = gtk::Image::builder()
+        .file("src/rps/assets/Red.png")
+        .pixel_size(150)
+        .halign(gtk::Align::End)
+        .build();
+    let vbox = Box::new(gtk::Orientation::Vertical, 3);
+    vbox.append(&red);
+    vbox.append(&pkm);
+    vbox.append(&hbox2);
+    vbox.append(&hbox1);
+    window.set_child(Some(&vbox));
+    application.connect_activate(move |_| {
+        window.show();
+    });
+}
+
 fn result(ans: i32) -> (i32, usize) {
     // 0 => rock; 1 => paper; 2 => scissors
     // 0 => win; 1 => lose; 2 => tie
@@ -53,101 +159,4 @@ fn result(ans: i32) -> (i32, usize) {
         }
     }
     (2, pick)
-}
-
-fn main() {
-    let application = Application::new(None, Default::default());
-    application.connect_activate(|app| {
-        let window = ApplicationWindow::new(app);
-        window.set_title(Some("Rock, Paper, Scissors"));
-        window.set_default_size(350, 70);
-        let pics = [
-            "src/rps/assets/Bulbasaur.png",
-            "src/rps/assets/Charmander.png",
-            "src/rps/assets/Squirtle.png",
-        ];
-        let pkm = gtk::Image::new();
-        pkm.set_pixel_size(100);
-        let wins = Arc::new(Counter::new(0));
-        let loses = Arc::new(Counter::new(0));
-        let ties = Arc::new(Counter::new(0));
-        let lab1 = Label::new(Some("Wins: 0"));
-        let lab2 = Label::new(Some("Loses: 0"));
-        let lab3 = Label::new(Some("Ties: 0"));
-        let hbox2 = Box::new(gtk::Orientation::Horizontal, 3);
-        hbox2.append(&lab1);
-        hbox2.append(&lab2);
-        hbox2.append(&lab3);
-        let btn1 = ImgBtn::new();
-        {
-            let lab1c = lab1.clone();
-            let lab2c = lab2.clone();
-            let lab3c = lab3.clone();
-            let winsc = wins.clone();
-            let losesc = loses.clone();
-            let tiesc = ties.clone();
-            let pkmc = pkm.clone();
-            btn1.connect_clicked(move |_| {
-                let (res, pick) = result(0);
-                pkmc.set_from_file(Some(pics[pick]));
-                match res {
-                    0 => lab1c.set_label(&format!("Wins: {}", winsc.increment())),
-                    1 => lab2c.set_label(&format!("Loses: {}", losesc.increment())),
-                    _ => lab3c.set_label(&format!("Ties: {}", tiesc.increment())),
-                }
-            });
-        }
-        btn1.set_image("src/rps/assets/BulbasaurBack.png");
-        let btn2 = ImgBtn::new();
-        {
-            let lab1c = lab1.clone();
-            let lab2c = lab2.clone();
-            let lab3c = lab3.clone();
-            let winsc = wins.clone();
-            let losesc = loses.clone();
-            let tiesc = ties.clone();
-            let pkmc = pkm.clone();
-            btn2.connect_clicked(move |_| {
-                let (res, pick) = result(1);
-                pkmc.set_from_file(Some(pics[pick]));
-                match res {
-                    0 => lab1c.set_label(&format!("Wins: {}", winsc.increment())),
-                    1 => lab2c.set_label(&format!("Loses: {}", losesc.increment())),
-                    _ => lab3c.set_label(&format!("Ties: {}", tiesc.increment())),
-                }
-            });
-        }
-        btn2.set_image("src/rps/assets/CharmanderBack.png");
-        let btn3 = ImgBtn::new();
-        {
-            let pkmc = pkm.clone();
-            btn3.connect_clicked(move |_| {
-                let (res, pick) = result(2);
-                pkmc.set_from_file(Some(pics[pick]));
-                match res {
-                    0 => lab1.set_label(&format!("Wins: {}", wins.increment())),
-                    1 => lab2.set_label(&format!("Loses: {}", loses.increment())),
-                    _ => lab3.set_label(&format!("Ties: {}", ties.increment())),
-                }
-            });
-        }
-        btn3.set_image("src/rps/assets/SquirtleBack.png");
-        let hbox1 = Box::new(gtk::Orientation::Horizontal, 3);
-        hbox1.append(&btn1);
-        hbox1.append(&btn2);
-        hbox1.append(&btn3);
-        let red = gtk::Image::builder()
-            .file("src/rps/assets/Red.png")
-            .pixel_size(150)
-            .halign(gtk::Align::End)
-            .build();
-        let vbox = Box::new(gtk::Orientation::Vertical, 3);
-        vbox.append(&red);
-        vbox.append(&pkm);
-        vbox.append(&hbox2);
-        vbox.append(&hbox1);
-        window.set_child(Some(&vbox));
-        window.show();
-    });
-    application.run();
 }
