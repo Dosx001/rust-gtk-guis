@@ -1,4 +1,4 @@
-use gtk::prelude::*;
+use gtk::{prelude::*, STYLE_PROVIDER_PRIORITY_APPLICATION};
 use gtk::{Application, ApplicationWindow, Box, Label};
 use gtk4 as gtk;
 use rand::Rng;
@@ -25,7 +25,14 @@ impl Counter {
 fn main() {
     let application = Application::new(None, Default::default());
     application.connect_startup(|app| {
-        build_ui(app)
+        let css = gtk::CssProvider::new();
+        css.load_from_data(include_bytes!("style.css"));
+        gtk::StyleContext::add_provider_for_display(
+            &gtk::gdk::Display::default().expect(""),
+            &css,
+            STYLE_PROVIDER_PRIORITY_APPLICATION,
+        );
+        build_ui(app);
     });
     application.run();
 }
@@ -47,9 +54,18 @@ fn build_ui(application: &Application) {
     let wins = Arc::new(Counter::new(0));
     let loses = Arc::new(Counter::new(0));
     let ties = Arc::new(Counter::new(0));
-    let lab1 = Label::new(Some("Wins: 0"));
-    let lab2 = Label::new(Some("Loses: 0"));
-    let lab3 = Label::new(Some("Ties: 0"));
+    let lab1 = Label::builder()
+        .label("Wins: 0")
+        .css_name("wins")
+        .build();
+    let lab2 = Label::builder()
+        .label("Loses: 0")
+        .css_name("loses")
+        .build();
+    let lab3 = Label::builder()
+        .label("Ties: 0")
+        .css_name("ties")
+        .build();
     let hbox2 = Box::new(gtk::Orientation::Horizontal, 3);
     hbox2.append(&lab1);
     hbox2.append(&lab2);
