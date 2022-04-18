@@ -22,13 +22,12 @@ impl Counter {
     }
 }
 
-fn result(ans: i32) -> (i32, &'static str) {
+fn result(ans: i32) -> (i32, usize) {
     // 0 => rock; 1 => paper; 2 => scissors
     // 0 => win; 1 => lose; 2 => tie
-    let pick: &str;
-    match rand::thread_rng().gen_range(0..2) {
+    let pick = rand::thread_rng().gen_range(0..3);
+    match pick {
         0 => {
-            pick = "rock";
             if ans == 1 {
                 return (0, pick);
             }
@@ -37,7 +36,6 @@ fn result(ans: i32) -> (i32, &'static str) {
             }
         }
         1 => {
-            pick = "paper";
             if ans == 2 {
                 return (0, pick);
             }
@@ -46,7 +44,6 @@ fn result(ans: i32) -> (i32, &'static str) {
             }
         }
         _ => {
-            pick = "scissors";
             if ans == 0 {
                 return (0, pick);
             }
@@ -64,9 +61,13 @@ fn main() {
         let window = ApplicationWindow::new(app);
         window.set_title(Some("Rock, Paper, Scissors"));
         window.set_default_size(350, 70);
-        let ans_lab = Label::new(Some(""));
-        let ans_box = Box::new(gtk::Orientation::Horizontal, 0);
-        ans_box.append(&ans_lab);
+        let pics = [
+            "src/rps/assets/Bulbasaur.png",
+            "src/rps/assets/Charmander.png",
+            "src/rps/assets/Squirtle.png",
+        ];
+        let pkm = gtk::Image::new();
+        pkm.set_pixel_size(100);
         let wins = Arc::new(Counter::new(0));
         let loses = Arc::new(Counter::new(0));
         let ties = Arc::new(Counter::new(0));
@@ -85,10 +86,10 @@ fn main() {
             let winsc = wins.clone();
             let losesc = loses.clone();
             let tiesc = ties.clone();
-            let ans_labc = ans_lab.clone();
+            let pkmc = pkm.clone();
             btn1.connect_clicked(move |_| {
                 let (res, pick) = result(0);
-                ans_labc.set_label(pick);
+                pkmc.set_from_file(Some(pics[pick]));
                 match res {
                     0 => lab1c.set_label(&format!("Wins: {}", winsc.increment())),
                     1 => lab2c.set_label(&format!("Loses: {}", losesc.increment())),
@@ -96,7 +97,7 @@ fn main() {
                 }
             });
         }
-        btn1.set_image("src/rps/assets/Bulbasaur.png");
+        btn1.set_image("src/rps/assets/BulbasaurBack.png");
         let btn2 = ImgBtn::new();
         {
             let lab1c = lab1.clone();
@@ -105,10 +106,10 @@ fn main() {
             let winsc = wins.clone();
             let losesc = loses.clone();
             let tiesc = ties.clone();
-            let ans_labc = ans_lab.clone();
+            let pkmc = pkm.clone();
             btn2.connect_clicked(move |_| {
                 let (res, pick) = result(1);
-                ans_labc.set_label(pick);
+                pkmc.set_from_file(Some(pics[pick]));
                 match res {
                     0 => lab1c.set_label(&format!("Wins: {}", winsc.increment())),
                     1 => lab2c.set_label(&format!("Loses: {}", losesc.increment())),
@@ -116,12 +117,13 @@ fn main() {
                 }
             });
         }
-        btn2.set_image("src/rps/assets/Charmander.png");
+        btn2.set_image("src/rps/assets/CharmanderBack.png");
         let btn3 = ImgBtn::new();
         {
+            let pkmc = pkm.clone();
             btn3.connect_clicked(move |_| {
                 let (res, pick) = result(2);
-                ans_lab.set_label(pick);
+                pkmc.set_from_file(Some(pics[pick]));
                 match res {
                     0 => lab1.set_label(&format!("Wins: {}", wins.increment())),
                     1 => lab2.set_label(&format!("Loses: {}", loses.increment())),
@@ -129,13 +131,19 @@ fn main() {
                 }
             });
         }
-        btn3.set_image("src/rps/assets/Squirtle.png");
+        btn3.set_image("src/rps/assets/SquirtleBack.png");
         let hbox1 = Box::new(gtk::Orientation::Horizontal, 3);
         hbox1.append(&btn1);
         hbox1.append(&btn2);
         hbox1.append(&btn3);
+        let red = gtk::Image::builder()
+            .file("src/rps/assets/Red.png")
+            .pixel_size(150)
+            .halign(gtk::Align::End)
+            .build();
         let vbox = Box::new(gtk::Orientation::Vertical, 3);
-        vbox.append(&ans_box);
+        vbox.append(&red);
+        vbox.append(&pkm);
         vbox.append(&hbox2);
         vbox.append(&hbox1);
         window.set_child(Some(&vbox));
